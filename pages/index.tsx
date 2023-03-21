@@ -1,11 +1,50 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import Head from "next/head";
+import Image from "next/image";
+import { useCallback, useState } from "react";
+import { Inter } from "next/font/google";
+import { Card, Input, Button, Typography } from "@material-tailwind/react";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const { executeRecaptcha } = useGoogleReCaptcha();
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (!executeRecaptcha) {
+        console.log("Execute recaptcha not yet available");
+        return;
+      }
+
+      executeRecaptcha("formSubmit").then(async (gReCaptchaToken) => {
+        console.log(gReCaptchaToken, "response Google reCaptcha server");
+
+        const form = e.target as HTMLFormElement;
+        const params = {
+          phoneNumber: form.phoneNumber.value as string,
+          recaptchaToken: gReCaptchaToken,
+        };
+
+        const response = await fetch("api/phone-calls", {
+          body: JSON.stringify(params),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+        });
+
+        if (response.status == 200) {
+          setSent(true);
+        } else {
+        }
+      });
+    },
+    [executeRecaptcha]
+  );
+
   return (
     <>
       <Head>
@@ -14,110 +53,35 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
+
+      <main>
+        <section className="bg-white">
+          <div className="layout flex min-h-screen flex-col items-center justify-center text-center">
+            {sent && (
+              <Typography variant="h1" color="green">
+                Sent
+              </Typography>
+            )}
+
+            <Card color="transparent" shadow={false}>
+              <Typography variant="h1" color="blue-gray">
+                Demo
+              </Typography>
+              <Typography color="gray" className="mt-1 font-normal">
+                Enter your phone number to receive calls.
+              </Typography>
+              <form className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96" onSubmit={handleSubmit}>
+                <div className="mb-4 flex flex-col gap-6">
+                  <Input size="lg" name="phoneNumber" label="Phone Number" />
+                </div>
+                <Button type="submit" className="mt-6" fullWidth>
+                  Submit
+                </Button>
+              </form>
+            </Card>
           </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
-          </div>
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+        </section>
       </main>
     </>
-  )
+  );
 }
