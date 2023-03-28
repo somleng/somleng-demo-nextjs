@@ -1,10 +1,10 @@
-import { useCallback, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
 import { Inter } from "next/font/google";
 import { Card, Alert, Button, Typography } from "@material-tailwind/react";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 import "react-phone-number-input/style.css";
-import PhoneInput from "react-phone-number-input";
+import PhoneInput, { Country } from "react-phone-number-input";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,11 +20,11 @@ export default function Home() {
   } as AlertNotification);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [disabledButton, setDisabledButton] = useState(false);
-  const countries = process.env.NEXT_PUBLIC_COUNTRIES?.split(",") || [];
-  const defaultCountry = process.env.NEXT_PUBLIC_DEFAULT_COUNTRY!;
+  const countries = (process.env.NEXT_PUBLIC_COUNTRIES?.split(",") || []) as Country[];
+  const defaultCountry = process.env.NEXT_PUBLIC_DEFAULT_COUNTRY! as Country;
 
   const handleSubmit = useCallback(
-    async (e: Event) => {
+    async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       if (!executeRecaptcha) {
