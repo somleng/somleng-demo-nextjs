@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Inter } from "next/font/google";
-import { Card, Alert, Input, Button, Typography } from "@material-tailwind/react";
+import { Card, Alert, Button, Typography } from "@material-tailwind/react";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 import "react-phone-number-input/style.css";
@@ -19,42 +19,45 @@ export default function Home() {
     display: false,
   } as AlertNotification);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [disabledButton, setDisabledButton] = useState(false);
   const countries = process.env.NEXT_PUBLIC_COUNTRIES?.split(",") || [];
   const defaultCountry = process.env.NEXT_PUBLIC_DEFAULT_COUNTRY!;
 
   const handleSubmit = useCallback(
-    (e: Event) => {
+    async (e: Event) => {
       e.preventDefault();
+
       if (!executeRecaptcha) {
         console.log("Execute recaptcha not yet available");
         return;
       }
 
-      executeRecaptcha("formSubmit").then(async (gReCaptchaToken) => {
-        console.log(gReCaptchaToken, "response Google reCaptcha server");
+      setDisabledButton(true);
 
-        const form = e.target as HTMLFormElement;
-        const params = {
-          phoneNumber: form.phoneNumber.value as string,
-          recaptchaToken: gReCaptchaToken,
-        };
+      const gReCaptchaToken = await executeRecaptcha("formSubmit");
+      console.log(gReCaptchaToken, "response Google reCaptcha server");
 
-        const response = await fetch("api/phone-calls", {
-          body: JSON.stringify(params),
-          headers: {
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-        });
+      const form = e.target as HTMLFormElement;
+      const params = {
+        phoneNumber: form.phoneNumber.value as string,
+        recaptchaToken: gReCaptchaToken,
+      };
 
-        const responseBody = await response.json();
-        if (response.status == 200) {
-          setPhoneNumber("");
-          setAlertNotification({ display: "success", message: responseBody.message });
-        } else {
-          setAlertNotification({ display: "error", message: responseBody.data });
-        }
+      const response = await fetch("api/phone-calls", {
+        body: JSON.stringify(params),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
       });
+
+      const responseBody = await response.json();
+      if (response.status == 200) {
+        setPhoneNumber("");
+        setAlertNotification({ display: "success", message: responseBody.message });
+      } else {
+        setAlertNotification({ display: "error", message: responseBody.message });
+      }
     },
     [executeRecaptcha]
   );
@@ -62,6 +65,7 @@ export default function Home() {
   const handleOnChange = (value: string) => {
     setPhoneNumber(value);
     setAlertNotification({ display: false });
+    setDisabledButton(false);
   };
 
   return (
@@ -102,7 +106,7 @@ export default function Home() {
               />
             </div>
 
-            <Button type="submit" className="mt-6" fullWidth>
+            <Button type="submit" className="mt-6" disabled={disabledButton} fullWidth>
               Submit
             </Button>
           </form>
