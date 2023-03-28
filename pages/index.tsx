@@ -19,6 +19,8 @@ export default function Home() {
     display: false,
   } as AlertNotification);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const countries = process.env.NEXT_PUBLIC_COUNTRIES?.split(",") || [];
+  const defaultCountry = process.env.NEXT_PUBLIC_DEFAULT_COUNTRY!;
 
   const handleSubmit = useCallback(
     (e: Event) => {
@@ -48,7 +50,7 @@ export default function Home() {
         const responseBody = await response.json();
         if (response.status == 200) {
           setPhoneNumber("");
-          setAlertNotification({ display: "success", message: "Phone call successfully queued." });
+          setAlertNotification({ display: "success", message: responseBody.message });
         } else {
           setAlertNotification({ display: "error", message: responseBody.data });
         }
@@ -83,13 +85,15 @@ export default function Home() {
             Demo
           </Typography>
           <Typography color="gray" className="mt-1 font-normal">
-            Enter your phone number to receive calls.
+            Enter your phone number to receive a call.
           </Typography>
           <form className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96" onSubmit={handleSubmit}>
             <div className="mb-4 flex flex-col gap-6">
               <PhoneInput
+                required
                 international={false}
-                countries={["CA", "US"]}
+                countries={countries}
+                defaultCountry={defaultCountry}
                 name="phoneNumber"
                 placeholder="Enter phone number"
                 className="border-solid"
