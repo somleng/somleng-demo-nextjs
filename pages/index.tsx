@@ -63,7 +63,6 @@ export default function Home() {
   );
 
   const handleOnChange = (value: string) => {
-    console.log(value);
     setPhoneNumber(value);
     setAlertNotification({ display: false });
     setDisabledButton(false);
