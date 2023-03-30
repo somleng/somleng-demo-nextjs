@@ -2,6 +2,7 @@ import { FormEvent, useCallback, useState } from "react";
 import { Inter } from "next/font/google";
 import { Card, Alert, Button, Typography } from "@material-tailwind/react";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import { parsePhoneNumber } from "react-phone-number-input";
 
 import "react-phone-number-input/style.css";
 import PhoneInput, { Country } from "react-phone-number-input";
@@ -37,9 +38,8 @@ export default function Home() {
       const gReCaptchaToken = await executeRecaptcha("formSubmit");
       console.log(gReCaptchaToken, "response Google reCaptcha server");
 
-      const form = e.target as HTMLFormElement;
       const params = {
-        phoneNumber: form.phoneNumber.value as string,
+        phoneNumber: phoneNumber,
         recaptchaToken: gReCaptchaToken,
       };
 
@@ -59,10 +59,11 @@ export default function Home() {
         setAlertNotification({ display: "error", message: responseBody.message });
       }
     },
-    [executeRecaptcha]
+    [executeRecaptcha, phoneNumber]
   );
 
   const handleOnChange = (value: string) => {
+    console.log(value);
     setPhoneNumber(value);
     setAlertNotification({ display: false });
     setDisabledButton(false);
@@ -95,7 +96,6 @@ export default function Home() {
             <div className="mb-4 flex flex-col gap-6">
               <PhoneInput
                 required
-                international={false}
                 countries={countries}
                 defaultCountry={defaultCountry}
                 name="phoneNumber"
