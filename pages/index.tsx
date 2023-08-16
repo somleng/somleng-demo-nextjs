@@ -2,7 +2,6 @@ import { FormEvent, useCallback, useState } from "react";
 import { Inter } from "next/font/google";
 import { Card, Alert, Button, Typography } from "@material-tailwind/react";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
-import { parsePhoneNumber } from "react-phone-number-input";
 
 import "react-phone-number-input/style.css";
 import PhoneInput, { Country } from "react-phone-number-input";
@@ -74,9 +73,7 @@ export default function Home() {
         <div className="p-8 absolute right-0">
           <Alert
             color={alertNotification.display === "success" ? "green" : "red"}
-            dismissible={{
-              onClose: () => setAlertNotification({ display: false }),
-            }}
+            onClose={() => setAlertNotification({ display: false })}
           >
             {alertNotification.message}
           </Alert>
