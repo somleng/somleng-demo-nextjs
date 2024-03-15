@@ -20,7 +20,7 @@
     "react-dom": "18.2.0",
     "react-google-recaptcha-v3": "^1.10.1",
     "react-phone-number-input": "^3.3.9",
-    "somleng": "^5.0.0",
+    "somleng": "^5.0.1",
     "typescript": "5.4.2"
   },
   "devDependencies": {
