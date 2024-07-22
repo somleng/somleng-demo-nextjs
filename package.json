@@ -21,7 +21,7 @@
     "react-google-recaptcha-v3": "^1.10.1",
     "react-phone-number-input": "^3.4.3",
     "somleng": "^5.2.2",
-    "typescript": "5.5.3"
+    "typescript": "5.5.4"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",
