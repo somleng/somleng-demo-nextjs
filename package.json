@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@material-tailwind/react": "^2.1.10",
-    "@types/node": "22.13.4",
+    "@types/node": "22.13.5",
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4",
     "eslint": "9.20.1",
