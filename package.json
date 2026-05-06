@@ -17,7 +17,7 @@
     "eslint-config-next": "16.2.4",
     "next": "16.2.5",
     "react": "19.2.5",
-    "react-dom": "19.2.5",
+    "react-dom": "19.2.6",
     "react-google-recaptcha-v3": "^1.11.0",
     "react-phone-number-input": "^3.4.16",
     "somleng": "^5.10.7",
